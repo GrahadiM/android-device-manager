@@ -16,7 +16,7 @@ class EnterpriseController extends Controller
     public function callback(Request $request)
     {
         $enterpriseToken = $request->query('enterpriseToken');
-        $signupUrlName = $request->query('signup_url_name');
+        $callbackState = $request->query('state');
 
         if (! $enterpriseToken) {
             return response()->json([
@@ -25,16 +25,16 @@ class EnterpriseController extends Controller
             ], 400);
         }
 
-        if (! $signupUrlName) {
+        if (! $callbackState) {
             return response()->json([
                 'success' => false,
-                'message' => 'signup_url_name tidak ditemukan.',
+                'message' => 'state tidak ditemukan.',
             ], 400);
         }
 
         $enterprise = $this->enterpriseService->createEnterprise(
             enterpriseToken: $enterpriseToken,
-            signupUrlName: $signupUrlName
+            callbackState: $callbackState
         );
 
         return response()->json([

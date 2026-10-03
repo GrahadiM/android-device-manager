@@ -5,6 +5,7 @@ namespace App\Services\AndroidManagement;
 use App\Models\AndroidManagementEnterprise;
 use Google\Service\AndroidManagement;
 use Google\Service\AndroidManagement\Enterprise;
+use Illuminate\Support\Str;
 
 class EnterpriseService
 {
@@ -19,10 +20,27 @@ class EnterpriseService
     }
 
     public function createSignupUrl(
-        string $callbackUrl
+        string $callbackBaseUrl
     ): AndroidManagementEnterprise {
         $service = $this->getClient();
 
+        /*
+         * State lokal untuk menghubungkan callback
+         * dengan record signup di database.
+         */
+        $callbackState = (string) Str::uuid();
+
+        $callbackUrl = $callbackBaseUrl
+            . '?state=' . urlencode($callbackState);
+
+        /*
+         * Google Android Management API:
+         *
+         * signupUrls.create({
+         *     projectId,
+         *     callbackUrl
+         * })
+         */
         $signupUrl = $service->signupUrls->create([
             'projectId' => config('google.project_id'),
             'callbackUrl' => $callbackUrl,
@@ -30,6 +48,7 @@ class EnterpriseService
 
         return AndroidManagementEnterprise::create([
             'signup_url_name' => $signupUrl->getName(),
+            'callback_state' => $callbackState,
             'signup_url' => $signupUrl->getUrl(),
             'status' => 'pending_signup',
         ]);
@@ -37,29 +56,39 @@ class EnterpriseService
 
     public function createEnterprise(
         string $enterpriseToken,
-        string $signupUrlName
+        string $callbackState
     ): AndroidManagementEnterprise {
         $service = $this->getClient();
 
+        $record = AndroidManagementEnterprise::query()
+            ->where('callback_state', $callbackState)
+            ->where('status', 'pending_signup')
+            ->firstOrFail();
+
+        /*
+         * Body enterprise.
+         *
+         * Untuk tahap awal kita biarkan kosong.
+         */
         $enterprise = new Enterprise();
 
+        /*
+         * Kita sengaja menggunakan optParams array karena
+         * generated PHP client yang terpasang di project
+         * menggunakan signature create($optParams = []).
+         */
         $result = $service->enterprises->create(
             $enterprise,
             [
                 'projectId' => config('google.project_id'),
-                'signupUrlName' => $signupUrlName,
+                'signupUrlName' => $record->signup_url_name,
                 'enterpriseToken' => $enterpriseToken,
             ]
         );
 
-        $record = AndroidManagementEnterprise::query()
-            ->where('signup_url_name', $signupUrlName)
-            ->where('status', 'pending_signup')
-            ->firstOrFail();
-
         $record->update([
             'name' => $result->getName(),
-            'display_name' => $result->getDisplayName(),
+            'display_name' => $result->getEnterpriseDisplayName(),
             'status' => 'active',
         ]);
 
