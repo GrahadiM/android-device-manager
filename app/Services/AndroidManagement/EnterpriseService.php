@@ -62,21 +62,14 @@ class EnterpriseService
 
         $record = AndroidManagementEnterprise::query()
             ->where('callback_state', $callbackState)
-            ->where('status', 'pending_signup')
             ->firstOrFail();
 
-        /*
-         * Body enterprise.
-         *
-         * Untuk tahap awal kita biarkan kosong.
-         */
+        if ($record->status === 'active' && $record->name) {
+            return $record;
+        }
+
         $enterprise = new Enterprise();
 
-        /*
-         * Kita sengaja menggunakan optParams array karena
-         * generated PHP client yang terpasang di project
-         * menggunakan signature create($optParams = []).
-         */
         $result = $service->enterprises->create(
             $enterprise,
             [
