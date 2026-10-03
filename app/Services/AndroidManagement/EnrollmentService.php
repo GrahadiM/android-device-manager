@@ -2,6 +2,7 @@
 
 namespace App\Services\AndroidManagement;
 
+use App\Models\AndroidManagementDevice;
 use App\Models\AndroidManagementEnterprise;
 use Google\Service\AndroidManagement;
 use Google\Service\AndroidManagement\EnrollmentToken;
@@ -18,9 +19,33 @@ class EnrollmentService
         return $this->client->make();
     }
 
-    public function createLabEnrollmentToken(
-        AndroidManagementEnterprise $enterprise
+    /**
+     * Membuat enrollment token untuk device tertentu.
+     *
+     * Asset code berasal dari database, bukan hardcode.
+     */
+    public function createEnrollmentToken(
+        AndroidManagementEnterprise $enterprise,
+        AndroidManagementDevice $device
     ): EnrollmentToken {
+        if (! $device->asset_code) {
+            throw new \RuntimeException(
+                'Device tidak memiliki asset code.'
+            );
+        }
+
+        if ($device->enterprise_id !== $enterprise->id) {
+            throw new \RuntimeException(
+                'Device tidak terhubung dengan enterprise yang dipilih.'
+            );
+        }
+
+        if ($device->google_device_name) {
+            throw new \RuntimeException(
+                'Device sudah memiliki Google device name dan kemungkinan sudah enrolled.'
+            );
+        }
+
         $service = $this->getClient();
 
         $policyName = $enterprise->name
@@ -28,15 +53,35 @@ class EnrollmentService
 
         $token = new EnrollmentToken();
 
-        $token->setPolicyName($policyName);
+        $token->setPolicyName(
+            $policyName
+        );
 
-        // 24 jam dalam format protobuf Duration.
-        $token->setDuration('86400s');
+        // 24 jam dalam protobuf Duration.
+        $token->setDuration(
+            '86400s'
+        );
 
-        $token->setOneTimeOnly(true);
+        $token->setOneTimeOnly(
+            true
+        );
+
+        /*
+         * Metadata ini bukan secret token.
+         *
+         * Contoh:
+         * {
+         *     "asset_code": "LAB-ANDROID-001"
+         * }
+         */
+        $token->setAllowPersonalUsage(
+            'PERSONAL_USAGE_DISALLOWED_USERLESS'
+        );
 
         $token->setAdditionalData(
-            'asset_code=VIVO-Y12-001'
+            json_encode([
+                'asset_code' => $device->asset_code,
+            ], JSON_THROW_ON_ERROR)
         );
 
         return $service->enterprises_enrollmentTokens->create(

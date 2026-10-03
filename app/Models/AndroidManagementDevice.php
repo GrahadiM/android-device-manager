@@ -13,6 +13,9 @@ class AndroidManagementDevice extends Model
         'enterprise_id',
         'asset_code',
         'google_device_name',
+        'enrollment_token_name',
+        'enrollment_token_expires_at',
+        'enrollment_status',
         'manufacturer',
         'model',
         'android_version',
@@ -29,6 +32,7 @@ class AndroidManagementDevice extends Model
     ];
 
     protected $casts = [
+        'enrollment_token_expires_at' => 'datetime',
         'is_test_device' => 'boolean',
     ];
 

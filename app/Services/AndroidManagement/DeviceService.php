@@ -20,6 +20,8 @@ class DeviceService
 
     /**
      * Mengambil semua device yang terdaftar pada enterprise.
+     *
+     * @return Device[]
      */
     public function listDevices(
         AndroidManagementEnterprise $enterprise
@@ -31,9 +33,7 @@ class DeviceService
                 $enterprise->name
             );
 
-        $devices = $response->getDevices();
-
-        return $devices ?? [];
+        return $response->getDevices() ?? [];
     }
 
     /**

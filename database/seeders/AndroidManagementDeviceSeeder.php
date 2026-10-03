@@ -11,43 +11,44 @@ class AndroidManagementDeviceSeeder extends Seeder
     {
         AndroidManagementDevice::updateOrCreate(
             [
-                'asset_code' => 'VIVO-Y12-001',
+                'asset_code' => 'LAB-ANDROID-001',
             ],
             [
                 'enterprise_id' => null,
 
-                /*
-                 * Belum enrolled ke Google.
-                 */
                 'google_device_name' => null,
 
-                'manufacturer' => 'vivo',
-                'model' => 'vivo Y12',
+                'enrollment_token_name' => null,
 
-                'android_version' => '9',
-                'os_name' => 'Funtouch OS 9',
+                'enrollment_token_expires_at' => null,
 
-                'build_number' => 'PD1901_A_1.21.38',
+                'enrollment_status' => 'pending',
 
-                'security_patch' => '2020-06-01',
+                'manufacturer' => 'Google',
 
-                'ram_gb' => 8,
+                'model' => 'CorporateLab Emulator',
+
+                'android_version' => '11',
+
+                'os_name' => 'Android',
+
+                'build_number' => null,
+
+                'security_patch' => null,
+
+                'ram_gb' => null,
 
                 'management_mode' => null,
 
-                'status' => 'local_testing',
+                'status' => 'pending_enrollment',
 
                 'assigned_phone_number' => null,
 
-                /*
-                 * Belum kita enforce sekarang.
-                 * Ini hanya metadata rencana policy.
-                 */
                 'allowed_primary_app' => 'com.whatsapp',
 
                 'is_test_device' => true,
 
-                'notes' => 'Lab test device - vivo Y12. Data lokal/dummy. Belum enrolled ke Android Management API.',
+                'notes' => 'Android Emulator lab device for Android Management API testing.',
             ]
         );
     }
