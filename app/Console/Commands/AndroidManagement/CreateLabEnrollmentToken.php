@@ -61,18 +61,41 @@ class CreateLabEnrollmentToken extends Command
 
         $this->newLine();
 
-        $this->warn('Enrollment token value:');
+        // Menampilkan token value dan QR code payload dapat menimbulkan risiko keamanan.
+        // $this->warn('Enrollment token value:');
+        // $this->line(
+        //     $token->getValue()
+        // );
+
+        // $this->newLine();
+
+        // Menampilkan QR code payload dapat menimbulkan risiko keamanan.
+        // $this->warn('QR code payload:');
+        // $this->line(
+        //     $token->getQrCode()
+        // );
+
+        $this->info('Enrollment token berhasil dibuat.');
 
         $this->line(
-            $token->getValue()
+            'Token name: ' . $token->getName()
         );
 
-        $this->newLine();
-
-        $this->warn('QR code payload:');
+        $this->line(
+            'Policy: ' . $token->getPolicyName()
+        );
 
         $this->line(
-            $token->getQrCode()
+            'Expiration: ' . $token->getExpirationTimestamp()
+        );
+
+        $this->line(
+            'One time only: '
+            . ($token->getOneTimeOnly() ? 'yes' : 'no')
+        );
+
+        $this->warn(
+            'Token value dan QR payload tidak ditampilkan.'
         );
 
         return self::SUCCESS;
