@@ -30,8 +30,13 @@ class PolicyService
 
         $policy->setName($policyName);
 
+        $whatsapp = new ApplicationPolicy();
+
+        $whatsapp->setPackageName('com.whatsapp');
+        $whatsapp->setInstallType('FORCE_INSTALLED');
+
         $policy->setApplications([
-            $this->makeWhatsappApplicationPolicy(),
+            $whatsapp,
         ]);
 
         $policy->setInstallAppsDisabled(true);
@@ -46,16 +51,5 @@ class PolicyService
             $policyName,
             $policy
         );
-    }
-
-    private function makeWhatsappApplicationPolicy(): ApplicationPolicy
-    {
-        $application = new ApplicationPolicy();
-
-        $application->setPackageName('com.whatsapp');
-
-        $application->setInstallType('FORCE_INSTALLED');
-
-        return $application;
     }
 }

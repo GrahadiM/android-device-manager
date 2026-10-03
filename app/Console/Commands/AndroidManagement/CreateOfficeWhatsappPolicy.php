@@ -38,7 +38,9 @@ class CreateOfficeWhatsappPolicy extends Command
 
         $this->newLine();
 
-        $this->info('Policy berhasil dibuat / diperbarui.');
+        $this->info(
+            'Policy berhasil dibuat / diperbarui.'
+        );
 
         $this->line(
             'Policy name: ' . $policy->getName()
