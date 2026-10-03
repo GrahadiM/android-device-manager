@@ -2,7 +2,9 @@
 
 return [
 
-    'project_id' => env('GOOGLE_CLOUD_PROJECT_ID'),
+    'project_id' => env(
+        'GOOGLE_CLOUD_PROJECT_ID'
+    ),
 
     'credentials' => env(
         'GOOGLE_APPLICATION_CREDENTIALS'
@@ -13,6 +15,11 @@ return [
         'scope' => env(
             'ANDROID_MANAGEMENT_API_SCOPE',
             'https://www.googleapis.com/auth/androidmanagement'
+        ),
+
+        'callback_path' => env(
+            'ANDROID_MANAGEMENT_CALLBACK_PATH',
+            '/api/android-management/enterprise/callback'
         ),
 
     ],
